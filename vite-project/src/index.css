@@ -129,3 +129,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Override React Flow node borders */
+.react-flow__node {
+  border: none !important;
+  background-color: transparent;
+}
+
+.react-flow__node-output {
+  border: none !important;
+  background-color: transparent;
+}

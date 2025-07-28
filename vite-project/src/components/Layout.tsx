@@ -54,7 +54,7 @@ export function Layout({ children, onStackCreate }: LayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="px-6 py-8">
+      <main className="px-6 py-8 bg-white w-full">
         {children}
       </main>
     </div>

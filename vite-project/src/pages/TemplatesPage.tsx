@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { Template } from '@/types'
 
 export function TemplatesPage() {
+  const navigate = useNavigate();
   const [templates] = useState<Template[]>([
     {
       id: '1',
@@ -85,7 +87,10 @@ export function TemplatesPage() {
             <p className="text-gray-600 text-sm mb-4">{template.description}</p>
             
             <div className="mt-auto">
-              <button className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium py-2 px-4 border border-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+              <button 
+                onClick={() => navigate('/flow-editor')}
+                className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium py-2 px-4 border border-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              >
                 Edit Stack
               </button>
             </div>
