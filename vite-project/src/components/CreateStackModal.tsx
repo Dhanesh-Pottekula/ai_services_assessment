@@ -1,4 +1,4 @@
-import  { useState } from "react"
+import  { useState, useEffect } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import { createStack, selectCreateStackLoading, selectCreateStackError, clearCreateError } from "@/store/slices/stackSlice"
 
 interface CreateStackModalProps {
   onStackCreate?: (stackData: { name: string; description: string }) => void
@@ -22,13 +24,32 @@ export function CreateStackModal({ onStackCreate }: CreateStackModalProps) {
   const [description, setDescription] = useState("Chat with your pdf docs")
   const [open, setOpen] = useState(false)
 
-  const handleCreate = () => {
+  const dispatch = useAppDispatch()
+  const createLoading = useAppSelector(selectCreateStackLoading)
+  const createError = useAppSelector(selectCreateStackError)
+
+  // Clear error when modal opens
+  useEffect(() => {
+    if (open) {
+      dispatch(clearCreateError())
+    }
+  }, [open, dispatch])
+
+  const handleCreate = async () => {
     if (name.trim() && description.trim()) {
-      onStackCreate?.({ name: name.trim(), description: description.trim() })
-      setOpen(false)
-      // Reset form
-      setName("Chat With PDF")
-      setDescription("Chat with your pdf docs")
+      const result = await dispatch(createStack({ 
+        name: name.trim(), 
+        description: description.trim() 
+      }))
+      
+      // If successful, close modal and call optional callback
+      if (createStack.fulfilled.match(result)) {
+        setOpen(false)
+        onStackCreate?.({ name: name.trim(), description: description.trim() })
+        // Reset form
+        setName("Chat With PDF")
+        setDescription("Chat with your pdf docs")
+      }
     }
   }
 
@@ -37,6 +58,7 @@ export function CreateStackModal({ onStackCreate }: CreateStackModalProps) {
     // Reset form
     setName("Chat With PDF")
     setDescription("Chat with your pdf docs")
+    dispatch(clearCreateError())
   }
 
   return (
@@ -59,6 +81,7 @@ export function CreateStackModal({ onStackCreate }: CreateStackModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter stack name"
+              disabled={createLoading}
             />
           </div>
           <div className="grid gap-2">
@@ -69,15 +92,21 @@ export function CreateStackModal({ onStackCreate }: CreateStackModalProps) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter stack description"
               rows={3}
+              disabled={createLoading}
             />
           </div>
+          {createError && (
+            <div className="text-red-500 text-sm">
+              {createError}
+            </div>
+          )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} disabled={createLoading}>
             Cancel
           </Button>
-          <Button  onClick={handleCreate}>
-            Create
+          <Button onClick={handleCreate} disabled={createLoading}>
+            {createLoading ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>
