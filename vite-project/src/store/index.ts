@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import stackReducer from './slices/stackSlice';
+import configReducer from './slices/configSlice';
 
 export const store = configureStore({
   reducer: {
     stack: stackReducer,
+    config: configReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
